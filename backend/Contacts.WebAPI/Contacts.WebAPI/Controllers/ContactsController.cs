@@ -1,4 +1,5 @@
-﻿using Contacts.WebAPI.DTOs;
+﻿using Contacts.WebAPI.Domain;
+using Contacts.WebAPI.DTOs;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,7 @@ public class ContactsController : ControllerBase
 
     // GET api/contacts
     [HttpGet]
-    public ActionResult<IEnumerable<ContactDto>> GetAll()
+    public ActionResult<IEnumerable<ContactDto>> GetContacts()
     {
         var contactsDto = _dataService.Contacts.Select(c => new ContactDto
         {
@@ -32,7 +33,7 @@ public class ContactsController : ControllerBase
 
     // GET api/contacts/1
     [HttpGet("{id:int}")]
-    public ActionResult<ContactDto> GetById(int id)
+    public ActionResult<ContactDto> GetContact(int id)
     {
         var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == id);
 
@@ -50,5 +51,32 @@ public class ContactsController : ControllerBase
         };
 
         return Ok(contactDto);
+    }
+
+    // POST api/contacts
+    [HttpPost]
+    public IActionResult CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
+    {
+        var maxId = _dataService.Contacts.Max(c => c.Id);
+
+        var contact = new Contact
+        {
+            Id = maxId + 1,
+            FirstName = contactForCreationDto.FirstName,
+            LastName = contactForCreationDto.LastName,
+            Email = contactForCreationDto.Email
+        };
+
+        _dataService.Contacts.Add(contact);
+
+        var contactDto = new ContactDto
+        {
+            Id = contact.Id,
+            FirstName = contact.FirstName,
+            LastName = contact.LastName,
+            Email = contact.Email
+        };
+
+        return CreatedAtAction(nameof(GetContact), new {id = contact.Id}, contactDto);
     }
 }
