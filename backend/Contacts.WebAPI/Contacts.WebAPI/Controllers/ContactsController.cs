@@ -17,10 +17,18 @@ public class ContactsController : ControllerBase
     }
 
     // GET api/contacts
+    // GET api/contacts?search=ski
     [HttpGet]
-    public ActionResult<IEnumerable<ContactDto>> GetContacts()
+    public ActionResult<IEnumerable<ContactDto>> GetContacts([FromQuery] string? search)
     {
-        var contactsDto = _dataService.Contacts.Select(c => new ContactDto
+        var query = _dataService.Contacts.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(c => c.LastName.Contains(search));
+        }
+
+        var contactsDto = query.Select(c => new ContactDto
         {
             Id = c.Id,
             FirstName = c.FirstName,
