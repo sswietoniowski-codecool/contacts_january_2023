@@ -115,4 +115,20 @@ public class ContactsController : ControllerBase
 
         return NoContent();
     }
+
+    // DELETE api/contacts/{id}
+    [HttpDelete("{id:int}")]
+    public IActionResult DeleteContact(int id)
+    {
+        var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == id);
+
+        if (contact is null)
+        {
+            return NotFound();
+        }
+
+        _dataService.Contacts.Remove(contact);
+
+        return NoContent();
+    }
 }
