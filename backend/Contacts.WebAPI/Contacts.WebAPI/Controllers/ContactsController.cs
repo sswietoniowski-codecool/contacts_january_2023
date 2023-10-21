@@ -97,4 +97,22 @@ public class ContactsController : ControllerBase
 
         return CreatedAtAction(nameof(GetContact), new {id = contact.Id}, contactDto);
     }
+
+    // PUT api/contacts/{id}
+    [HttpPut("{id:int}")]
+    public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
+    {
+        var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == id);
+
+        if (contact is null)
+        {
+            return NotFound();
+        }
+
+        contact.FirstName = contactForUpdateDto.FirstName;
+        contact.LastName = contactForUpdateDto.LastName;
+        contact.Email = contactForUpdateDto.Email;
+
+        return NoContent();
+    }
 }
