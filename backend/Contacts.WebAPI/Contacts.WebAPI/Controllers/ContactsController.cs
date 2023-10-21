@@ -15,8 +15,9 @@ public class ContactsController : ControllerBase
         _dataService = dataService;
     }
 
-    [HttpGet()]
-    public ActionResult<IEnumerable<ContactDto>> Get()
+    // GET api/contacts
+    [HttpGet]
+    public ActionResult<IEnumerable<ContactDto>> GetAll()
     {
         var contactsDto = _dataService.Contacts.Select(c => new ContactDto
         {
@@ -27,5 +28,27 @@ public class ContactsController : ControllerBase
         });
 
         return Ok(contactsDto);
+    }
+
+    // GET api/contacts/1
+    [HttpGet("{id:int}")]
+    public ActionResult<ContactDto> GetById(int id)
+    {
+        var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == id);
+
+        if (contact is null)
+        {
+            return NotFound();
+        }
+
+        var contactDto = new ContactDto
+        {
+            Id = contact.Id,
+            FirstName = contact.FirstName,
+            LastName = contact.LastName,
+            Email = contact.Email
+        };
+
+        return Ok(contactDto);
     }
 }
