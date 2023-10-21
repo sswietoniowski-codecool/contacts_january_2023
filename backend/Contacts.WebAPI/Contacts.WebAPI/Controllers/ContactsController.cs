@@ -1,6 +1,7 @@
 ﻿using Contacts.WebAPI.Domain;
 using Contacts.WebAPI.DTOs;
 using Contacts.WebAPI.Infrastructure;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contacts.WebAPI.Controllers;
@@ -128,6 +129,43 @@ public class ContactsController : ControllerBase
         }
 
         _dataService.Contacts.Remove(contact);
+
+        return NoContent();
+    }
+
+    // PATCH api/contacts/{id}
+    [HttpPatch("{id:int}")]
+    public IActionResult PartiallyUpdateContact(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
+    {
+        var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == id);
+
+        if (contact is null)
+        {
+            return NotFound();
+        }
+
+        var contactToBePatched = new ContactForUpdateDto()
+        {
+            FirstName = contact.FirstName,
+            LastName = contact.LastName,
+            Email = contact.Email,
+        };
+
+        patchDocument.ApplyTo(contactToBePatched, ModelState);
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (!TryValidateModel(contactToBePatched))
+        {
+            return BadRequest(ModelState);
+        }
+
+        contact.FirstName = contactToBePatched.FirstName;
+        contact.LastName = contactToBePatched.LastName;
+        contact.Email = contactToBePatched.Email;
 
         return NoContent();
     }
