@@ -4,13 +4,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace Contacts.WebAPI.Controllers;
 
 [ApiController]
-public class ContactsController : Controller
+public class ContactsController : ControllerBase
 {
+    private readonly DataService _dataService;
+
+    public ContactsController(DataService dataService)
+    {
+        _dataService = dataService;
+    }
+
     [HttpGet("api/contacts")]
     public IActionResult Get()
     {
         return new JsonResult(
-            DataService.Instance.Contacts
+            _dataService.Contacts
         );
     }
 }

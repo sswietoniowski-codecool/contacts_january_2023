@@ -6,9 +6,7 @@ namespace Contacts.WebAPI.Infrastructure
     {
         public List<Contact> Contacts { get; }
 
-        public static DataService Instance { get; } = new DataService();
-
-        private DataService()
+        public DataService()
         {
             Contacts = new()
             {
