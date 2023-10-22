@@ -9,7 +9,6 @@ builder.Services.AddDbContext<ContactsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ContactsDb"));
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
-builder.Services.AddSingleton<DataService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
