@@ -103,7 +103,7 @@ public class ContactsController : ControllerBase
     [HttpPut("{id:int}")]
     public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
     {
-        var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == id);
+        var contact = _dbContext.Contacts.SingleOrDefault(c => c.Id == id);
 
         if (contact is null)
         {
@@ -113,6 +113,8 @@ public class ContactsController : ControllerBase
         contact.FirstName = contactForUpdateDto.FirstName;
         contact.LastName = contactForUpdateDto.LastName;
         contact.Email = contactForUpdateDto.Email;
+
+        _dbContext.SaveChanges();
 
         return NoContent();
     }
@@ -138,7 +140,7 @@ public class ContactsController : ControllerBase
     [HttpPatch("{id:int}")]
     public IActionResult PartiallyUpdateContact(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
     {
-        var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == id);
+        var contact = _dbContext.Contacts.SingleOrDefault(c => c.Id == id);
 
         if (contact is null)
         {
@@ -167,6 +169,8 @@ public class ContactsController : ControllerBase
         contact.FirstName = contactToBePatched.FirstName;
         contact.LastName = contactToBePatched.LastName;
         contact.Email = contactToBePatched.Email;
+
+        _dbContext.SaveChanges();
 
         return NoContent();
     }
