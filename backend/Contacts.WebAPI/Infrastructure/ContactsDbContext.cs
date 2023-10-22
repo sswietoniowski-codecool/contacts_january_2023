@@ -27,7 +27,7 @@ namespace Contacts.WebAPI.Infrastructure
                     {
                         Id = 2,
                         FirstName = "Adam",
-                        LastName = "Nowak",
+                        LastName = "Nowak [BD]",
                         Email = "anowak@u.pl"
 
                     }
