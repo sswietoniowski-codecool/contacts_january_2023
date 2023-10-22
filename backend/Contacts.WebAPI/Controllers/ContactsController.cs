@@ -10,12 +10,10 @@ namespace Contacts.WebAPI.Controllers;
 [Route("api/contacts")]
 public class ContactsController : ControllerBase
 {
-    private readonly DataService _dataService;
     private readonly ContactsDbContext _dbContext;
 
-    public ContactsController(DataService dataService, ContactsDbContext dbContext)
+    public ContactsController(ContactsDbContext dbContext)
     {
-        _dataService = dataService;
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
