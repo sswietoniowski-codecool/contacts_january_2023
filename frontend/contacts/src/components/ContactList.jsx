@@ -4,32 +4,25 @@ const ContactList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [contacts, setContacts] = useState([]);
 
-  const fetchContacts = async () => {
-    const response = await fetch('http://localhost:5000/contacts');
-    const data = await response.json();
-    return data;
-  };
-
   useEffect(() => {
-    const getContacts = async () => {
-      const contactsFromServer = await fetchContacts();
-      setContacts((prev) => [...prev, contactsFromServer]);
-      setIsLoading(false);
-    };
-    getContacts();
+    fetchContacts();
   }, []);
+
+  const fetchContacts = async () => {
+    const response = await fetch('https://localhost:5001/api/contacts');
+    const data = await response.json();
+    setContacts(data);
+    setIsLoading(false);
+  };
 
   return isLoading ? (
     <div>Loading...</div>
   ) : (
-    <div>
+    <ul>
       {contacts.map((contact) => (
-        <div key={contact.id}>
-          <h3>{contact.name}</h3>
-          <p>{contact.email}</p>
-        </div>
+        <li key={contact.id}>{contact.firstName}</li>
       ))}
-    </div>
+    </ul>
   );
 };
 
