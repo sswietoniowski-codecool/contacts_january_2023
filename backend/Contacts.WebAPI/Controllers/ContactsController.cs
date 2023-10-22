@@ -69,7 +69,7 @@ public class ContactsController : ControllerBase
             {
                 Id = p.Id,
                 Number = p.Number,
-                Description = p.Description
+                Description = p.Description,
             })
         };
 
@@ -193,5 +193,17 @@ public class ContactsController : ControllerBase
         _dbContext.SaveChanges();
 
         return NoContent();
+    }
+
+    [HttpGet("loop")]
+    public ActionResult<Contact> GetLoop()
+    {
+        // demo method to demonstrate the loop problem: 
+        // https://dotnetcoretutorials.com/fixing-json-self-referencing-loop-exceptions/
+        var contact = _dbContext.Contacts
+            .Include(c => c.Phones)
+            .SingleOrDefault(c => c.Id == 1);
+
+        return Ok(contact);
     }
 }

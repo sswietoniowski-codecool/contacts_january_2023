@@ -12,8 +12,10 @@ builder.Services.AddDbContext<ContactsDbContext>(options =>
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    // required to prevent "Self referencing loop detected" error
+    //options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
