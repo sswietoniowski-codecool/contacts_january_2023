@@ -1,8 +1,10 @@
 ﻿using Contacts.WebAPI.Domain;
 using Contacts.WebAPI.DTOs;
 using Contacts.WebAPI.Infrastructure;
+using Contacts.WebAPI.Infrastructure.Migrations;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Contacts.WebAPI.Controllers;
 
@@ -42,24 +44,32 @@ public class ContactsController : ControllerBase
 
     // GET api/contacts/1
     [HttpGet("{id:int}")]
-    public ActionResult<ContactDto> GetContact(int id)
+    public ActionResult<ContactDetailsDto> GetContact(int id)
     {
-        var contact = _dbContext.Contacts.Find(id);
+        var contact = _dbContext.Contacts
+            .Include(c => c.Phones)
+            .SingleOrDefault(c => c.Id == id);
 
         if (contact is null)
         {
             return NotFound();
         }
 
-        var contactDto = new ContactDto
+        var contactDetailsDto = new ContactDetailsDto
         {
             Id = contact.Id,
             FirstName = contact.FirstName,
             LastName = contact.LastName,
-            Email = contact.Email
+            Email = contact.Email,
+            Phones = contact.Phones.Select(p => new PhoneDto
+            {
+                Id = p.Id,
+                Number = p.Number,
+                Description = p.Description
+            })
         };
 
-        return Ok(contactDto);
+        return Ok(contactDetailsDto);
     }
 
     // POST api/contacts
