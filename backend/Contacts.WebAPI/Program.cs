@@ -1,3 +1,4 @@
+using System.Reflection;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,8 @@ builder.Services.AddDbContext<ContactsDbContext>(options =>
 });
 
 builder.Services.AddScoped<IContactsRepository, ContactsRepository>();
+
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
