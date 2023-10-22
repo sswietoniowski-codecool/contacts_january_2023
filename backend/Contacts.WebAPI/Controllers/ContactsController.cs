@@ -46,7 +46,7 @@ public class ContactsController : ControllerBase
     [HttpGet("{id:int}")]
     public ActionResult<ContactDto> GetContact(int id)
     {
-        var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == id);
+        var contact = _dbContext.Contacts.Find(id);
 
         if (contact is null)
         {
