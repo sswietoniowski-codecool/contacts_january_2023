@@ -1,7 +1,6 @@
 ﻿using Contacts.WebAPI.Domain;
 using Contacts.WebAPI.DTOs;
 using Contacts.WebAPI.Infrastructure;
-using Contacts.WebAPI.Infrastructure.Migrations;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +9,8 @@ namespace Contacts.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/contacts")]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 public class ContactsController : ControllerBase
 {
     private readonly ContactsDbContext _dbContext;
@@ -22,6 +23,7 @@ public class ContactsController : ControllerBase
     // GET api/contacts
     // GET api/contacts?search=ski
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<IEnumerable<ContactDto>> GetContacts([FromQuery] string? search)
     {
         var query = _dbContext.Contacts.AsQueryable();
@@ -44,6 +46,8 @@ public class ContactsController : ControllerBase
 
     // GET api/contacts/1
     [HttpGet("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<ContactDetailsDto> GetContact(int id)
     {
         var contact = _dbContext.Contacts
@@ -74,6 +78,8 @@ public class ContactsController : ControllerBase
 
     // POST api/contacts
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
     {
         if (contactForCreationDto.FirstName == contactForCreationDto.LastName)
@@ -104,11 +110,13 @@ public class ContactsController : ControllerBase
             Email = contact.Email
         };
 
-        return CreatedAtAction(nameof(GetContact), new {id = contact.Id}, contactDto);
+        return CreatedAtAction(nameof(GetContact), new { id = contact.Id }, contactDto);
     }
 
     // PUT api/contacts/{id}
     [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
     {
         var contact = _dbContext.Contacts.SingleOrDefault(c => c.Id == id);
@@ -129,6 +137,8 @@ public class ContactsController : ControllerBase
 
     // DELETE api/contacts/{id}
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult DeleteContact(int id)
     {
         var contact = _dbContext.Contacts.SingleOrDefault(c => c.Id == id);
@@ -146,6 +156,8 @@ public class ContactsController : ControllerBase
 
     // PATCH api/contacts/{id}
     [HttpPatch("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult PartiallyUpdateContact(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
     {
         var contact = _dbContext.Contacts.SingleOrDefault(c => c.Id == id);
