@@ -78,17 +78,15 @@ public class ContactsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var maxId = _dataService.Contacts.Max(c => c.Id);
-
         var contact = new Contact
         {
-            Id = maxId + 1,
             FirstName = contactForCreationDto.FirstName,
             LastName = contactForCreationDto.LastName,
             Email = contactForCreationDto.Email
         };
 
-        _dataService.Contacts.Add(contact);
+        _dbContext.Contacts.Add(contact);
+        _dbContext.SaveChanges();
 
         var contactDto = new ContactDto
         {
