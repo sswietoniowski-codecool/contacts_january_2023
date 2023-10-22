@@ -10,6 +10,8 @@ builder.Services.AddDbContext<ContactsDbContext>(options =>
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
+builder.Services.AddScoped<IContactsRepository, ContactsRepository>();
+
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     // required to prevent "Self referencing loop detected" error
