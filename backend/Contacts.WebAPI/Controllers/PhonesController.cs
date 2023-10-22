@@ -1,6 +1,7 @@
 ﻿using Contacts.WebAPI.DTOs;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Contacts.WebAPI.Controllers
 {
@@ -8,18 +9,20 @@ namespace Contacts.WebAPI.Controllers
     [Route("/api/contacts/{contactId:int}/phones")]
     public class PhonesController : ControllerBase
     {
-        private readonly DataService _dataService;
+        private readonly ContactsDbContext _dbContext;
 
-        public PhonesController(DataService dataService)
+        public PhonesController(ContactsDbContext dbContext)
         {
-            _dataService = dataService;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
         // GET api/contacts/1/phones
         [HttpGet]
         public ActionResult<IEnumerable<PhoneDto>> GetPhones(int contactId)
         {
-            var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == contactId);
+            var contact = _dbContext.Contacts
+                .Include(c => c.Phones)
+                .SingleOrDefault(c => c.Id == contactId);
 
             if (contact is null)
             {
@@ -41,14 +44,8 @@ namespace Contacts.WebAPI.Controllers
         [HttpGet("{phoneId:int}")]
         public ActionResult<PhoneDto> GetPhone(int contactId, int phoneId)
         {
-            var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == contactId);
-
-            if (contact is null)
-            {
-                return NotFound();
-            }
-
-            var phone = contact.Phones.SingleOrDefault(p => p.Id == phoneId);
+            var phone = _dbContext.Phones
+                .SingleOrDefault(p => p.Id == phoneId && p.ContactId == contactId);
 
             if (phone is null)
             {
