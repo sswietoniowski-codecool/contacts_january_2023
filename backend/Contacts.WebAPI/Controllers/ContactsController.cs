@@ -1,4 +1,5 @@
-﻿using Contacts.WebAPI.Domain;
+﻿using AutoMapper;
+using Contacts.WebAPI.Domain;
 using Contacts.WebAPI.DTOs;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.JsonPatch;
@@ -13,10 +14,12 @@ namespace Contacts.WebAPI.Controllers;
 public class ContactsController : ControllerBase
 {
     private readonly IContactsRepository _repository;
+    private readonly IMapper _mapper;
 
-    public ContactsController(IContactsRepository repository)
+    public ContactsController(IContactsRepository repository, IMapper mapper)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
     // GET api/contacts
@@ -27,13 +30,7 @@ public class ContactsController : ControllerBase
     {
         var contacts = _repository.GetContacts(search);
 
-        var contactsDto = contacts.Select(c => new ContactDto
-        {
-            Id = c.Id,
-            FirstName = c.FirstName,
-            LastName = c.LastName,
-            Email = c.Email
-        });
+        var contactsDto = _mapper.Map<IEnumerable<ContactDto>>(contacts);
 
         return Ok(contactsDto);
     }
@@ -51,19 +48,7 @@ public class ContactsController : ControllerBase
             return NotFound();
         }
 
-        var contactDetailsDto = new ContactDetailsDto
-        {
-            Id = contact.Id,
-            FirstName = contact.FirstName,
-            LastName = contact.LastName,
-            Email = contact.Email,
-            Phones = contact.Phones.Select(p => new PhoneDto
-            {
-                Id = p.Id,
-                Number = p.Number,
-                Description = p.Description,
-            })
-        };
+        var contactDetailsDto = _mapper.Map<ContactDetailsDto>(contact);
 
         return Ok(contactDetailsDto);
     }

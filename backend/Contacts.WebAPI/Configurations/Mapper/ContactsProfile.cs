@@ -9,7 +9,7 @@ namespace Contacts.WebAPI.Configurations.Mapper
         public ContactsProfile()
         {
             CreateMap<Contact, ContactDto>();
-            //CreateMap<Contact, ContactDetailsDto>();
+            CreateMap<Contact, ContactDetailsDto>();
             CreateMap<Phone, PhoneDto>();
         }
     }
