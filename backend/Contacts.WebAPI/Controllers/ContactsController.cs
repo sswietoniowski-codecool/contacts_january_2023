@@ -121,14 +121,15 @@ public class ContactsController : ControllerBase
     [HttpDelete("{id:int}")]
     public IActionResult DeleteContact(int id)
     {
-        var contact = _dataService.Contacts.SingleOrDefault(c => c.Id == id);
+        var contact = _dbContext.Contacts.SingleOrDefault(c => c.Id == id);
 
         if (contact is null)
         {
             return NotFound();
         }
 
-        _dataService.Contacts.Remove(contact);
+        _dbContext.Contacts.Remove(contact);
+        _dbContext.SaveChanges();
 
         return NoContent();
     }
