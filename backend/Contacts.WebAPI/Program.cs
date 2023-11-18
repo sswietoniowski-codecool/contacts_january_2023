@@ -1,4 +1,6 @@
+using System.Net;
 using System.Reflection;
+using System.Text.Json;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -65,7 +67,24 @@ if (app.Environment.IsDevelopment())
 else
 {
     // should be added first:
-    app.UseExceptionHandler();
+    app.UseExceptionHandler(applicationBuilder =>
+    {
+        applicationBuilder.Run(async context =>
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.ContentType = "application/json";
+            var problemDetails = new ProblemDetails
+            {
+                Title = "An unexpected error occurred!",
+                Status = context.Response.StatusCode,
+                Detail = "Please contact your system administrator!"
+            };
+            var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
+            // TODO: log the exception
+            //await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
+            await context.Response.WriteAsync(problemDetailsJson);
+        });
+    });
 }
 
 app.UseHttpsRedirection();
