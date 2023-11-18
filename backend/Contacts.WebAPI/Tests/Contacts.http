@@ -23,3 +23,6 @@ Content-Type: application/json
 
 ### Delete single contact
 DELETE {{baseUrl}}/contacts/{{id}}
+
+### Get images (exception)
+GET {{baseUrl}}/images

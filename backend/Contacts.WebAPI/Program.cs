@@ -49,6 +49,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddResponseCaching();
 builder.Services.AddMemoryCache();
 
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -56,6 +58,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    // should be added first:
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // should be added first:
+    app.UseExceptionHandler();
 }
 
 app.UseHttpsRedirection();
