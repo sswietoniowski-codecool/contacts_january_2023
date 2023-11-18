@@ -1,4 +1,4 @@
-@baseUrl = https://localhost:5001/api
+@baseUrl = http://localhost:5001/api
 @id = 3
 
 ### Get all contacts
