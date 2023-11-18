@@ -1,5 +1,6 @@
 using System.Reflection;
 using Contacts.WebAPI.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,11 +27,20 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers().AddNewtonsoftJson(options =>
-{
-    // required to prevent "Self referencing loop detected" error
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-});
+builder.Services.AddControllers(configure =>
+    {
+        configure.CacheProfiles.Add("Any-60", 
+            new CacheProfile
+            {
+                Location = ResponseCacheLocation.Any,
+                Duration = 60
+            });
+    })
+    .AddNewtonsoftJson(options =>
+    {
+        // required to prevent "Self referencing loop detected" error
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
