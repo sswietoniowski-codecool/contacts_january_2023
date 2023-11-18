@@ -17,12 +17,15 @@ public class ContactsController : ControllerBase
     private readonly IContactsRepository _repository;
     private readonly IMapper _mapper;
     private readonly IMemoryCache _memoryCache;
+    private readonly ILogger<ContactsController> _logger;
 
-    public ContactsController(IContactsRepository repository, IMapper mapper, IMemoryCache memoryCache)
+    public ContactsController(IContactsRepository repository, IMapper mapper, IMemoryCache memoryCache,
+        ILogger<ContactsController> logger)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     // GET api/contacts
@@ -55,10 +58,14 @@ public class ContactsController : ControllerBase
     [ResponseCache(CacheProfileName = "Any-60")]
     public ActionResult<ContactDetailsDto> GetContact(int id)
     {
+        _logger.LogInformation($"Getting contact with id {id}");
+
         var cacheKey = $"{nameof(ContactsController)}-{nameof(GetContact)}-{id}";
 
         if (!_memoryCache.TryGetValue<ContactDetailsDto>(cacheKey, out var contactDto))
         {
+            _logger.LogWarning($"Contact with id {id} was not found in cache. Retrieving from database");
+
             var contact = _repository.GetContact(id);
 
             if (contact is not null)
@@ -71,6 +78,8 @@ public class ContactsController : ControllerBase
 
         if (contactDto is null)
         {
+            _logger.LogError($"Contact with id {id} was not found in database");
+
             return NotFound();
         }
 
