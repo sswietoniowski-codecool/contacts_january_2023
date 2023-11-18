@@ -18,14 +18,16 @@ public class ContactsController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IMemoryCache _memoryCache;
     private readonly ILogger<ContactsController> _logger;
+    private readonly IConfiguration _configuration;
 
     public ContactsController(IContactsRepository repository, IMapper mapper, IMemoryCache memoryCache,
-        ILogger<ContactsController> logger)
+        ILogger<ContactsController> logger, IConfiguration configuration)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
     // GET api/contacts
@@ -34,6 +36,21 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<IEnumerable<ContactDto>> GetContacts([FromQuery] string? search)
     {
+        var origins = new List<string>();
+
+        _configuration.Bind("Cors:Origins", origins);
+
+        var origin = Request.Headers["Origin"].ToString();
+
+        if (origins.Contains(origin))
+        {
+            _logger.LogInformation("Request from {source} is allowed", origin);
+        }
+        else
+        {
+            _logger.LogWarning("Request from {source} is not allowed", origin);
+        }
+
         try
         {
             var contacts = _repository.GetContacts(search);
