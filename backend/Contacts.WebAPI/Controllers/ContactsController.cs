@@ -72,6 +72,7 @@ public class ContactsController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ResponseCache(NoStore = true)]
     public IActionResult CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
     {
         if (contactForCreationDto.FirstName == contactForCreationDto.LastName)
