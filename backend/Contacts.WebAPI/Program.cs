@@ -1,11 +1,11 @@
-using System.Net;
-using System.Reflection;
-using System.Text.Json;
 using Contacts.WebAPI.Configurations.Options;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Net;
+using System.Reflection;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +27,12 @@ builder.Services.AddScoped<IContactsRepository, ContactsRepository>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-builder.Services.Configure<CorsConfiguration>(builder.Configuration.GetSection("Cors"));
+//builder.Services.Configure<CorsConfiguration>(builder.Configuration.GetSection("Cors"));
+
+builder.Services.AddOptions<CorsConfiguration>()
+    .Bind(builder.Configuration.GetSection("Cors"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddCors(options =>
 {
@@ -48,7 +53,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers(configure =>
     {
-        configure.CacheProfiles.Add("Any-60", 
+        configure.CacheProfiles.Add("Any-60",
             new CacheProfile
             {
                 Location = ResponseCacheLocation.Any,
