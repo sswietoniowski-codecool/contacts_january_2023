@@ -7,6 +7,10 @@ GET {{baseUrl}}/contacts
 ### Get single contact
 GET {{baseUrl}}/contacts/{{id}}
 
+### Get single contact (no cache)
+GET {{baseUrl}}/contacts/{{id}}
+Cache-Control: max-age=0, no-cache
+
 ### Create single contact
 POST {{baseUrl}}/contacts
 Content-Type: application/json

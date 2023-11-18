@@ -4,6 +4,7 @@ using Contacts.WebAPI.DTOs;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Contacts.WebAPI.Controllers;
 
@@ -15,11 +16,13 @@ public class ContactsController : ControllerBase
 {
     private readonly IContactsRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IMemoryCache _memoryCache;
 
-    public ContactsController(IContactsRepository repository, IMapper mapper)
+    public ContactsController(IContactsRepository repository, IMapper mapper, IMemoryCache memoryCache)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
     }
 
     // GET api/contacts
@@ -43,16 +46,26 @@ public class ContactsController : ControllerBase
     [ResponseCache(CacheProfileName = "Any-60")]
     public ActionResult<ContactDetailsDto> GetContact(int id)
     {
-        var contact = _repository.GetContact(id);
+        var cacheKey = $"{nameof(ContactsController)}-{nameof(GetContact)}-{id}";
 
-        if (contact is null)
+        if (!_memoryCache.TryGetValue<ContactDetailsDto>(cacheKey, out var contactDto))
+        {
+            var contact = _repository.GetContact(id);
+
+            if (contact is not null)
+            {
+                contactDto = _mapper.Map<ContactDetailsDto>(contact);
+
+                _memoryCache.Set(cacheKey, contactDto, TimeSpan.FromSeconds(60));
+            }
+        }
+
+        if (contactDto is null)
         {
             return NotFound();
         }
 
-        var contactDetailsDto = _mapper.Map<ContactDetailsDto>(contact);
-
-        return Ok(contactDetailsDto);
+        return Ok(contactDto);
     }
 
     // POST api/contacts
