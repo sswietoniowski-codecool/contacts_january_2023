@@ -1,8 +1,12 @@
-@baseUrl = http://localhost:5001/api
-@id = 3
+@baseUrl = http://localhost:5000/api
+@id = 1
 
 ### Get all contacts
 GET {{baseUrl}}/contacts
+
+### Get single contact
+GET {{baseUrl}}/contacts/{{id}}
+
 
 ### Delete single contact
 DELETE {{baseUrl}}/contacts/{{id}}
