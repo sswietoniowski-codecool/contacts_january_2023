@@ -1,6 +1,7 @@
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
+using Contacts.WebAPI.Configurations.Options;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,8 @@ builder.Services.AddDbContext<ContactsDbContext>(options =>
 builder.Services.AddScoped<IContactsRepository, ContactsRepository>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+builder.Services.Configure<CorsConfiguration>(builder.Configuration.GetSection("Cors"));
 
 builder.Services.AddCors(options =>
 {

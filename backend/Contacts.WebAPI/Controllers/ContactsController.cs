@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Contacts.WebAPI.Configurations.Options;
 using Contacts.WebAPI.Domain;
 using Contacts.WebAPI.DTOs;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Contacts.WebAPI.Controllers;
 
@@ -18,16 +20,16 @@ public class ContactsController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IMemoryCache _memoryCache;
     private readonly ILogger<ContactsController> _logger;
-    private readonly IConfiguration _configuration;
+    private readonly CorsConfiguration _corsConfiguration;
 
     public ContactsController(IContactsRepository repository, IMapper mapper, IMemoryCache memoryCache,
-        ILogger<ContactsController> logger, IConfiguration configuration)
+        ILogger<ContactsController> logger, IOptions<CorsConfiguration> corsOptions)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _corsConfiguration = corsOptions.Value ?? throw new ArgumentException(nameof(corsOptions));
     }
 
     // GET api/contacts
@@ -36,9 +38,7 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<IEnumerable<ContactDto>> GetContacts([FromQuery] string? search)
     {
-        var origins = new List<string>();
-
-        _configuration.Bind("Cors:Origins", origins);
+        var origins = _corsConfiguration.Origins;
 
         var origin = Request.Headers["Origin"].ToString();
 
