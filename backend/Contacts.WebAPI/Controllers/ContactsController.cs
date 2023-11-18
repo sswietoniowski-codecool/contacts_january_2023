@@ -31,11 +31,20 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<IEnumerable<ContactDto>> GetContacts([FromQuery] string? search)
     {
-        var contacts = _repository.GetContacts(search);
+        try
+        {
+            var contacts = _repository.GetContacts(search);
 
-        var contactsDto = _mapper.Map<IEnumerable<ContactDto>>(contacts);
+            var contactsDto = _mapper.Map<IEnumerable<ContactDto>>(contacts);
 
-        return Ok(contactsDto);
+            return Ok(contactsDto);
+        }
+        catch (Exception exception)
+        {
+            // TODO: log the exception
+
+            return Problem("Please try again later...", statusCode: 500);
+        }
     }
 
     // GET api/contacts/1
