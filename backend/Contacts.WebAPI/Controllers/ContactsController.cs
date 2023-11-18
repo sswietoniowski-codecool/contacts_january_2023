@@ -58,13 +58,13 @@ public class ContactsController : ControllerBase
     [ResponseCache(CacheProfileName = "Any-60")]
     public ActionResult<ContactDetailsDto> GetContact(int id)
     {
-        _logger.LogInformation($"Getting contact with id {id}");
+        _logger.LogInformation("Getting contact with id {id}", id);
 
         var cacheKey = $"{nameof(ContactsController)}-{nameof(GetContact)}-{id}";
 
         if (!_memoryCache.TryGetValue<ContactDetailsDto>(cacheKey, out var contactDto))
         {
-            _logger.LogWarning($"Contact with id {id} was not found in cache. Retrieving from database");
+            _logger.LogWarning("Contact with id {id} was not found in cache. Retrieving from database", id);
 
             var contact = _repository.GetContact(id);
 
@@ -78,7 +78,7 @@ public class ContactsController : ControllerBase
 
         if (contactDto is null)
         {
-            _logger.LogError($"Contact with id {id} was not found in database");
+            _logger.LogError("Contact with id {id} was not found in database", id);
 
             return NotFound();
         }

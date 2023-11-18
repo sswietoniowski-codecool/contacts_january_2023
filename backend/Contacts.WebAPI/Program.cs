@@ -4,8 +4,16 @@ using System.Text.Json;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// add logging
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
 // Add services to the container.
 builder.Services.AddDbContext<ContactsDbContext>(options =>
@@ -52,6 +60,12 @@ builder.Services.AddResponseCaching();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddProblemDetails();
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration);
+    configuration.ReadFrom.Services(services);
+}, preserveStaticLogger: true);
 
 var app = builder.Build();
 
