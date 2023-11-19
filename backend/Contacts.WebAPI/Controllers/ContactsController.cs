@@ -36,7 +36,7 @@ public class ContactsController : ControllerBase
     // GET api/contacts?search=ski
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<IEnumerable<ContactDto>> GetContacts([FromQuery] string? search)
+    public async Task<ActionResult<IEnumerable<ContactDto>>> GetContacts([FromQuery] string? search)
     {
         var origins = _corsConfiguration.Origins;
 
@@ -53,7 +53,7 @@ public class ContactsController : ControllerBase
 
         try
         {
-            var contacts = _repository.GetContacts(search);
+            var contacts = await _repository.GetContactsAsync(search);
 
             var contactsDto = _mapper.Map<IEnumerable<ContactDto>>(contacts);
 

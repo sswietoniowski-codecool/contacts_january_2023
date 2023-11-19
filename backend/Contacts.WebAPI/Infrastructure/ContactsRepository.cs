@@ -13,7 +13,7 @@ public class ContactsRepository : IContactsRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public IEnumerable<Contact> GetContacts(string? search)
+    public async Task<IEnumerable<Contact>> GetContactsAsync(string? search)
     {
         var query = _dbContext.Contacts.AsQueryable();
 
@@ -22,7 +22,7 @@ public class ContactsRepository : IContactsRepository
             query = query.Where(c => c.LastName.Contains(search));
         }
 
-        return query.ToList();
+        return await query.ToListAsync();
     }
 
     public Contact? GetContact(int id)
