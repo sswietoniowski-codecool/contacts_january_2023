@@ -10,6 +10,7 @@ using System.Net;
 using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Contacts.WebAPI.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -168,6 +169,19 @@ app.MapGet("api/contacts/{id:int}", Results<Ok<ContactDetailsDto>, NotFound, Bad
     }
 
     return TypedResults.Ok(contactDto);
+})
+    .WithName("GetContact");
+
+app.MapPost("api/contacts", CreatedAtRoute<ContactDto> ([FromBody] ContactForCreationDto contactForCreationDto,
+    IContactsRepository repository, IMapper mapper) =>
+{
+    var contact = mapper.Map<Contact>(contactForCreationDto);
+
+    repository.CreateContact(contact);
+
+    var contactDto = mapper.Map<ContactDto>(contact);
+
+    return TypedResults.CreatedAtRoute(contactDto, "GetContact", new { id = contact.Id });
 });
 
 app.Run();

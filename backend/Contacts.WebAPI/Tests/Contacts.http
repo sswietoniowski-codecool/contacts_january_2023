@@ -16,7 +16,7 @@ POST {{baseUrl}}/contacts
 Content-Type: application/json
 
 {
-    "firstName": "Alice",
+    "firstName": "John",
     "lastName": "Smith",
     "email": "asmith@unknown.com"
 }
