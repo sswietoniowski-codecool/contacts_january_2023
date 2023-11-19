@@ -33,3 +33,6 @@ Origin: http://localhost:5173
 
 ### Get all contacts (searching)
 GET {{baseUrl}}/contacts?q=ski
+
+### Get all contacts (filtering)
+GET {{baseUrl}}/contacts?lastName=Smith

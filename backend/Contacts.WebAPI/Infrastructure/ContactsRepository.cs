@@ -12,13 +12,18 @@ public class ContactsRepository : IContactsRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<IEnumerable<Contact>> GetContactsAsync(string? search)
+    public async Task<IEnumerable<Contact>> GetContactsAsync(string? search, string? lastName)
     {
         var query = _dbContext.Contacts.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
             query = query.Where(c => c.LastName.Contains(search) || c.FirstName.Contains(search) || c.Email.Contains(search));
+        }
+
+        if (!string.IsNullOrWhiteSpace(lastName))
+        {
+            query = query.Where(c => c.LastName == lastName);
         }
 
         return await query.ToListAsync();
