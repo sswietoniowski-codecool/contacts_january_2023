@@ -36,3 +36,9 @@ GET {{baseUrl}}/contacts?q=ski
 
 ### Get all contacts (filtering)
 GET {{baseUrl}}/contacts?lastName=Smith
+
+### Get all contacts (sorting)
+GET {{baseUrl}}/contacts?orderBy=lastName
+
+### Get all contacts (sorting descending)
+GET {{baseUrl}}/contacts?orderBy=lastName&desc=true

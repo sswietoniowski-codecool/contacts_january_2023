@@ -1,4 +1,5 @@
 ﻿using Contacts.WebAPI.Domain;
+using Contacts.WebAPI.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Contacts.WebAPI.Infrastructure;
@@ -12,7 +13,8 @@ public class ContactsRepository : IContactsRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<IEnumerable<Contact>> GetContactsAsync(string? search, string? lastName)
+    public async Task<IEnumerable<Contact>> GetContactsAsync(string? search, string? lastName,
+        string? orderBy, bool? desc)
     {
         var query = _dbContext.Contacts.AsQueryable();
 
@@ -24,6 +26,20 @@ public class ContactsRepository : IContactsRepository
         if (!string.IsNullOrWhiteSpace(lastName))
         {
             query = query.Where(c => c.LastName == lastName);
+        }
+
+        if (!string.IsNullOrWhiteSpace(orderBy))
+        {
+            if (orderBy.Equals(nameof(ContactDto.LastName), StringComparison.OrdinalIgnoreCase))
+            {
+                query = desc == true
+                    ? query.OrderByDescending(c => c.LastName)
+                    : query.OrderBy(c => c.LastName);
+            }
+            else
+            {
+                throw new ArgumentException("Invalid orderBy value", nameof(orderBy));
+            }
         }
 
         return await query.ToListAsync();
