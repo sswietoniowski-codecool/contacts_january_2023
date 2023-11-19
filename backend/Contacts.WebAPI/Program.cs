@@ -9,6 +9,7 @@ using Serilog;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -126,17 +127,17 @@ app.UseCors();
 
 app.UseResponseCaching();
 
-app.MapGet("api/contacts", ([FromQuery] string ? search, 
+app.MapGet("api/contacts", Results<Ok<IEnumerable<ContactDto>>, BadRequest> ([FromQuery] string ? search, 
     IContactsRepository repository, IMapper mapper) =>
 {
     var contacts = repository.GetContacts(search);
 
     var contactsDto = mapper.Map<IEnumerable<ContactDto>>(contacts);
 
-    return Results.Ok(contactsDto);
+    return TypedResults.Ok(contactsDto);
 });
 
-app.MapGet("api/contacts/{id:int}", (int id,
+app.MapGet("api/contacts/{id:int}", Results<Ok<ContactDetailsDto>, NotFound, BadRequest> (int id,
     IContactsRepository repository, IMapper mapper,
     ILogger<WebApplication> logger,
     IMemoryCache memoryCache) =>
@@ -163,10 +164,10 @@ app.MapGet("api/contacts/{id:int}", (int id,
     {
         logger.LogError("Contact with id {id} was not found in database", id);
 
-        return Results.NotFound();
+        return TypedResults.NotFound();
     }
 
-    return Results.Ok(contactDto);
+    return TypedResults.Ok(contactDto);
 });
 
 app.Run();
