@@ -123,6 +123,6 @@ app.UseCors();
 
 app.UseResponseCaching();
 
-app.MapControllers();
+app.MapGet("/api", () => "Hello World!");
 
 app.Run();
