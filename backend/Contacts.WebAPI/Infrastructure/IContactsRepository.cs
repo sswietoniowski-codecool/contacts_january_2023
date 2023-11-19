@@ -8,5 +8,5 @@ public interface IContactsRepository
     Task<Contact?> GetContactAsync(int id);
     Task CreateContactAsync(Contact contact);
     Task<bool> UpdateContactAsync(Contact contact);
-    bool DeleteContact(int id);
+    Task<bool> DeleteContactAsync(int id);
 }

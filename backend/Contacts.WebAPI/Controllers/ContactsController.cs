@@ -152,9 +152,9 @@ public class ContactsController : ControllerBase
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult DeleteContact(int id)
+    public async Task<IActionResult> DeleteContact(int id)
     {
-        var success = _repository.DeleteContact(id);
+        var success = await _repository.DeleteContactAsync(id);
 
         return success ? NoContent() : NotFound();
     }

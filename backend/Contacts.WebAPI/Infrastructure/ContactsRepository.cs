@@ -56,9 +56,9 @@ public class ContactsRepository : IContactsRepository
         return true;
     }
 
-    public bool DeleteContact(int id)
+    public async Task<bool> DeleteContactAsync(int id)
     {
-        var contact = _dbContext.Contacts.SingleOrDefault(c => c.Id == id);
+        var contact = await _dbContext.Contacts.SingleOrDefaultAsync(c => c.Id == id);
 
         if (contact is null)
         {
@@ -66,7 +66,7 @@ public class ContactsRepository : IContactsRepository
         }
 
         _dbContext.Contacts.Remove(contact);
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
 
         return true;
     }
