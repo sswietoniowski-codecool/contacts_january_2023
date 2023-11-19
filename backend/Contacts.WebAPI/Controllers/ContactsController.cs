@@ -133,12 +133,12 @@ public class ContactsController : ControllerBase
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
+    public async Task<IActionResult> UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
     {
         var contact = _mapper.Map<Contact>(contactForUpdateDto);
         contact.Id = id;
 
-        var success = _repository.UpdateContact(contact);
+        var success = await _repository.UpdateContactAsync(contact);
 
         if (!success)
         {
@@ -188,7 +188,7 @@ public class ContactsController : ControllerBase
 
         _mapper.Map(contactToBePatched, contact);
 
-        var success = _repository.UpdateContact(contact);
+        var success = await _repository.UpdateContactAsync(contact);
 
         if (!success)
         {

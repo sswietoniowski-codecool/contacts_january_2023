@@ -38,9 +38,9 @@ public class ContactsRepository : IContactsRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public bool UpdateContact(Contact contact)
+    public async Task<bool> UpdateContactAsync(Contact contact)
     {
-        var contactFromDb = _dbContext.Contacts.SingleOrDefault(c => c.Id == contact.Id);
+        var contactFromDb = await _dbContext.Contacts.SingleOrDefaultAsync(c => c.Id == contact.Id);
 
         if (contactFromDb is null)
         {
@@ -51,7 +51,7 @@ public class ContactsRepository : IContactsRepository
         contactFromDb.LastName = contact.LastName;
         contactFromDb.Email = contact.Email;
 
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
 
         return true;
     }
