@@ -73,7 +73,7 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
     [ResponseCache(CacheProfileName = "Any-60")]
-    public ActionResult<ContactDetailsDto> GetContact(int id)
+    public async Task<ActionResult<ContactDetailsDto>> GetContact(int id)
     {
         _logger.LogInformation("Getting contact with id {id}", id);
 
@@ -83,7 +83,7 @@ public class ContactsController : ControllerBase
         {
             _logger.LogWarning("Contact with id {id} was not found in cache. Retrieving from database", id);
 
-            var contact = _repository.GetContact(id);
+            var contact = await _repository.GetContactAsync(id);
 
             if (contact is not null)
             {
@@ -163,9 +163,9 @@ public class ContactsController : ControllerBase
     [HttpPatch("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult PartiallyUpdateContact(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
+    public async Task<IActionResult> PartiallyUpdateContact(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
     {
-        var contact = _repository.GetContact(id);
+        var contact = await _repository.GetContactAsync(id);
 
         if (contact is null)
         {

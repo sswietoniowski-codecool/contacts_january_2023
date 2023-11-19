@@ -25,11 +25,11 @@ public class ContactsRepository : IContactsRepository
         return await query.ToListAsync();
     }
 
-    public Contact? GetContact(int id)
+    public async Task<Contact?> GetContactAsync(int id)
     {
-        return _dbContext.Contacts
+        return await _dbContext.Contacts
             .Include(c => c.Phones)
-            .SingleOrDefault(c => c.Id == id);
+            .SingleOrDefaultAsync(c => c.Id == id);
     }
 
     public void CreateContact(Contact contact)
