@@ -108,7 +108,7 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ResponseCache(NoStore = true)]
-    public IActionResult CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
+    public async Task<IActionResult> CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
     {
         if (contactForCreationDto.FirstName == contactForCreationDto.LastName)
         {
@@ -122,7 +122,7 @@ public class ContactsController : ControllerBase
 
         var contact = _mapper.Map<Contact>(contactForCreationDto);
 
-        _repository.CreateContact(contact);
+        await _repository.CreateContactAsync(contact);
 
         var contactDto = _mapper.Map<ContactDto>(contact);
 

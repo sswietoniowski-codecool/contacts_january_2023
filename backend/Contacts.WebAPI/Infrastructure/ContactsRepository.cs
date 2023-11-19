@@ -32,10 +32,10 @@ public class ContactsRepository : IContactsRepository
             .SingleOrDefaultAsync(c => c.Id == id);
     }
 
-    public void CreateContact(Contact contact)
+    public async Task CreateContactAsync(Contact contact)
     {
         _dbContext.Contacts.Add(contact);
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
     }
 
     public bool UpdateContact(Contact contact)

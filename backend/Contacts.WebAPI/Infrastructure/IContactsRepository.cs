@@ -6,7 +6,7 @@ public interface IContactsRepository
 {
     Task<IEnumerable<Contact>> GetContactsAsync(string? search);
     Task<Contact?> GetContactAsync(int id);
-    void CreateContact(Contact contact);
+    Task CreateContactAsync(Contact contact);
     bool UpdateContact(Contact contact);
     bool DeleteContact(int id);
 }
