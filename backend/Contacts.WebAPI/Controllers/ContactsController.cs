@@ -33,10 +33,10 @@ public class ContactsController : ControllerBase
     }
 
     // GET api/contacts
-    // GET api/contacts?search=ski
+    // GET api/contacts?q=ski
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<ContactDto>>> GetContacts([FromQuery] string? search)
+    public async Task<ActionResult<IEnumerable<ContactDto>>> GetContacts([FromQuery(Name="q")] string? search)
     {
         var origins = _corsConfiguration.Origins;
 

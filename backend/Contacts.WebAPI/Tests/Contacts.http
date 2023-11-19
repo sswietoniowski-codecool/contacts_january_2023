@@ -30,3 +30,6 @@ GET {{baseUrl}}/images
 ### Get all contacts (with origin)
 GET {{baseUrl}}/contacts
 Origin: http://localhost:5173
+
+### Get all contacts (searching)
+GET {{baseUrl}}/contacts?q=ski
