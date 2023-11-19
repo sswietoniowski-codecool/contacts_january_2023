@@ -13,7 +13,7 @@ public class ContactsRepository : IContactsRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<IEnumerable<Contact>> GetContactsAsync(string? search, string? lastName,
+    public async Task<(IEnumerable<Contact>, PaginationMetadata)> GetContactsAsync(string? search, string? lastName,
         string? orderBy, bool? desc,
         int pageNumber, int pageSize)
     {
@@ -29,6 +29,8 @@ public class ContactsRepository : IContactsRepository
             query = query.Where(c => c.LastName == lastName);
         }
 
+        var totalItemCount = await query.CountAsync();
+
         if (!string.IsNullOrWhiteSpace(orderBy))
         {
             if (orderBy.Equals(nameof(ContactDto.LastName), StringComparison.OrdinalIgnoreCase))
@@ -43,12 +45,14 @@ public class ContactsRepository : IContactsRepository
             }
         }
 
+        var paginationMetadata = new PaginationMetadata(totalItemCount, pageNumber, pageSize);
+
         var collectionToReturn = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
-        return collectionToReturn;
+        return (collectionToReturn, paginationMetadata);
     }
 
     public async Task<Contact?> GetContactAsync(int id)

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace Contacts.WebAPI.Controllers;
 
@@ -68,10 +69,12 @@ public class ContactsController : ControllerBase
 
         try
         {
-            var contacts = await _repository.GetContactsAsync(search, lastName, orderBy, desc,
+            var (contacts, paginationMetadata) = await _repository.GetContactsAsync(search, lastName, orderBy, desc,
                 (int)pageNumber, (int)pageSize);
 
             var contactsDto = _mapper.Map<IEnumerable<ContactDto>>(contacts);
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(contactsDto);
         }
