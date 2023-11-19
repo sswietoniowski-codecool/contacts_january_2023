@@ -42,3 +42,7 @@ GET {{baseUrl}}/contacts?orderBy=lastName
 
 ### Get all contacts (sorting descending)
 GET {{baseUrl}}/contacts?orderBy=lastName&desc=true
+
+### Get contacts (using paging)
+GET {{baseUrl}}/contacts?orderBy=LastName&pageNumber=2&pageSize=3
+

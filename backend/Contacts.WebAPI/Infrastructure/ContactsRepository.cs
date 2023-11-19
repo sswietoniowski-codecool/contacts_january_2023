@@ -14,7 +14,8 @@ public class ContactsRepository : IContactsRepository
     }
 
     public async Task<IEnumerable<Contact>> GetContactsAsync(string? search, string? lastName,
-        string? orderBy, bool? desc)
+        string? orderBy, bool? desc,
+        int pageNumber, int pageSize)
     {
         var query = _dbContext.Contacts.AsQueryable();
 
@@ -42,7 +43,12 @@ public class ContactsRepository : IContactsRepository
             }
         }
 
-        return await query.ToListAsync();
+        var collectionToReturn = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return collectionToReturn;
     }
 
     public async Task<Contact?> GetContactAsync(int id)

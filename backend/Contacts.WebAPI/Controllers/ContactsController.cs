@@ -39,7 +39,9 @@ public class ContactsController : ControllerBase
     public async Task<ActionResult<IEnumerable<ContactDto>>> GetContacts([FromQuery(Name="q")] string? search,
         [FromQuery] string? lastName,
         [FromQuery] string? orderBy,
-        [FromQuery] bool? desc)
+        [FromQuery] bool? desc,
+        [FromQuery] int? pageNumber,
+        [FromQuery] int? pageSize)
     {
         var origins = _corsConfiguration.Origins;
 
@@ -54,9 +56,20 @@ public class ContactsController : ControllerBase
             _logger.LogWarning("Request from {source} is not allowed", origin);
         }
 
+        if (pageNumber is null || pageNumber < 0)
+        {
+            pageNumber = 1;
+        }
+
+        if (pageSize is null || pageSize < 0 || pageSize > 10)
+        {
+            pageSize = 2;
+        }
+
         try
         {
-            var contacts = await _repository.GetContactsAsync(search, lastName, orderBy, desc);
+            var contacts = await _repository.GetContactsAsync(search, lastName, orderBy, desc,
+                (int)pageNumber, (int)pageSize);
 
             var contactsDto = _mapper.Map<IEnumerable<ContactDto>>(contacts);
 
