@@ -1,7 +1,10 @@
+using AutoMapper;
 using Contacts.WebAPI.Configurations.Options;
+using Contacts.WebAPI.DTOs;
 using Contacts.WebAPI.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 using System.Net;
 using System.Reflection;
@@ -123,6 +126,47 @@ app.UseCors();
 
 app.UseResponseCaching();
 
-app.MapGet("/api", () => "Hello World!");
+app.MapGet("api/contacts", ([FromQuery] string ? search, 
+    IContactsRepository repository, IMapper mapper) =>
+{
+    var contacts = repository.GetContacts(search);
+
+    var contactsDto = mapper.Map<IEnumerable<ContactDto>>(contacts);
+
+    return Results.Ok(contactsDto);
+});
+
+app.MapGet("api/contacts/{id:int}", (int id,
+    IContactsRepository repository, IMapper mapper,
+    ILogger<WebApplication> logger,
+    IMemoryCache memoryCache) =>
+{
+    logger.LogInformation("Getting contact with id {id}", id);
+
+    var cacheKey = $"Contacts-{id}";
+
+    if (!memoryCache.TryGetValue<ContactDetailsDto>(cacheKey, out var contactDto))
+    {
+        logger.LogWarning("Contact with id {id} was not found in cache. Retrieving from database", id);
+
+        var contact = repository.GetContact(id);
+
+        if (contact is not null)
+        {
+            contactDto = mapper.Map<ContactDetailsDto>(contact);
+
+            memoryCache.Set(cacheKey, contactDto, TimeSpan.FromSeconds(60));
+        }
+    }
+
+    if (contactDto is null)
+    {
+        logger.LogError("Contact with id {id} was not found in database", id);
+
+        return Results.NotFound();
+    }
+
+    return Results.Ok(contactDto);
+});
 
 app.Run();
